@@ -1,0 +1,17 @@
+<div id="header">
+    <p>Event Manager</p>
+    <% if user_signed_in? %>
+        <div id='links'>
+            <%= link_to 'Log out', destroy_user_session_path, id:'session'%>
+            <%= link_to 'New Event', new_event_path , id:'session'%>
+            <%= link_to 'Your events', user_path(current_user.id) , id:'session'%>
+        </div>
+    <%else%>
+        <div id='links'>
+            <%= link_to 'Sign in', new_user_session_path, id:'session'%>
+            <%= link_to 'Sign up', new_user_registration_path, id:'session'%>
+        </div>
+    <% end %>
+    
+</div>
+<p id='unauthorized'>You are not authorized to access this page. </p>

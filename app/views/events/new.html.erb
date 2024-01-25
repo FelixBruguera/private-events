@@ -1,0 +1,39 @@
+<head>
+    <script type="module">
+        const check = document.querySelector('#event_private')
+        const hidden = document.querySelector('#users-new-event')
+        check.addEventListener('click', () => hidden.className = hidden.className == 'hid' ? 'show' : 'hid')
+    </script>
+</head>
+<div id="header">
+    <p>Event Manager</p>
+    <div id='links'>
+        <%= link_to 'Log out', destroy_user_session_path, id:'session'%>
+        <%= link_to 'New Event', new_event_path , id:'session'%>
+        <%= link_to 'Your events', 'users/show' , id:'session'%>
+        <%= link_to 'Home', root_path, id:'session'%>
+    </div>
+</div><p id='new-event'>New Event</p>
+
+<%= form_with model: @event do |f|%>
+<%= f.label(:name, 'Name') %>
+<%= f.text_field(:name) %>
+<%= f.label(:location, 'Location') %>
+<%= f.text_field(:location) %>
+<%= f.label(:date, 'Date') %>
+<%= f.date_field(:date) %>
+<div id='form-flex'>
+<%= f.check_box :private %>
+<%= f.label(:private, 'Private Event')%>
+</div>
+<div id='users-new-event' class='hid'>
+    <% User.all.each do |user| %>
+        <div id='form-flex'>
+            <%= f.check_box :invited, {multiple: true},user.id, nil%>
+            <%= f.label :invited, user.email.to_s %>
+        </div>
+    <% end %>
+</div>
+<%= f.hidden_field(:creator, :value => current_user.id)%>
+<%= f.submit %>
+<% end %>

@@ -1,0 +1,20 @@
+<div id="header">
+    <p>Event Manager</p>
+    <div id='links'>
+        <%= link_to 'Log out', destroy_user_session_path, id:'session'%>
+        <%= link_to 'New Event', new_event_path , id:'session'%>
+            <%= link_to 'Your events', user_path(current_user.id) , id:'session'%>
+        <%= link_to 'Home', root_path, id:'session'%>
+    </div>
+</div><p id='new-event'><%= @event.name %></p>
+
+<%= form_with model: @event do |f|%>
+<%= f.label(:name, 'Name') %>
+<%= f.text_field(:name, :value => @event.name) %>
+<%= f.label(:location, 'Location') %>
+<%= f.text_field(:location, :value => @event.location) %>
+<%= f.label(:date, 'Date') %>
+<%= f.date_field(:date, :value => @event.date) %>
+<%=  f.hidden_field(:creator, :value => current_user.id)%>
+<%= f.submit %>
+<% end %>

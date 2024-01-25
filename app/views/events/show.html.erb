@@ -1,0 +1,62 @@
+<head>
+<%= stylesheet_link_tag 'eventshow.css' %>
+</head>
+<% event = Event.find(params[:id])%>
+<% if user_signed_in? && (event.private != true || EventAttendance.where(attendee: current_user.id, attended_event: event.id).exists?) %>
+<div id="header">
+    <p>Event Manager</p>
+    <div id='links'>
+        <%= link_to 'Log out', destroy_user_session_path, id:'session'%>
+        <%= link_to 'New Event', new_event_path , id:'session'%>
+        <%= link_to 'Your events', user_path(current_user.id) , id:'session'%>
+        <%= link_to 'Home', root_path, id:'session'%>
+    </div>
+</div>
+<% if event.creator == current_user.id %>
+    <div id='user-options'>
+        <%= link_to 'Edit', edit_event_path(event.id) %>
+        <%= link_to 'Delete', event_path(event.id), data: {turbo_method: :delete, turbo_confirm: 'Are you sure?'} %>
+    </div>
+<% end %>
+<div id='event-box'>
+    <p id='new-event'><%= event.name %> </p>
+    <div id='events'>
+            <div id='show-host'>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>account-circle</title><path d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z" /></svg>
+                <p id='creator'><%= User.find(event.creator).email %> </p>
+            </div>
+                <div id='location'>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>map-marker</title><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" /></svg>
+                    <p><%= event.location %> </p>
+                </div>
+                <div id='date'>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>calendar-range</title><path d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z" /></svg>
+                    <p><%= event.date.strftime("%F") %></p>
+                </div>
+                <div id='attend'>
+                    <% unless current_user.nil? %>
+                        <% if EventAttendance.where(attendee:current_user.id, attended_event: event.id).exists? %>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>account-check-outline</title><path d="M21.1,12.5L22.5,13.91L15.97,20.5L12.5,17L13.9,15.59L15.97,17.67L21.1,12.5M11,4A4,4 0 0,1 15,8A4,4 0 0,1 11,12A4,4 0 0,1 7,8A4,4 0 0,1 11,4M11,6A2,2 0 0,0 9,8A2,2 0 0,0 11,10A2,2 0 0,0 13,8A2,2 0 0,0 11,6M11,13C11.68,13 12.5,13.09 13.41,13.26L11.74,14.93L11,14.9C8.03,14.9 4.9,16.36 4.9,17V18.1H11.1L13,20H3V17C3,14.34 8.33,13 11,13Z" /></svg>
+                        <%= link_to 'Attending', event_attendance_path,data: {turbo_method: :delete}, id: 'show-link'%>
+                        <% else %>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>account-plus-outline</title><path d="M15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4M15,5.9C16.16,5.9 17.1,6.84 17.1,8C17.1,9.16 16.16,10.1 15,10.1A2.1,2.1 0 0,1 12.9,8A2.1,2.1 0 0,1 15,5.9M4,7V10H1V12H4V15H6V12H9V10H6V7H4M15,13C12.33,13 7,14.33 7,17V20H23V17C23,14.33 17.67,13 15,13M15,14.9C17.97,14.9 21.1,16.36 21.1,17V18.1H8.9V17C8.9,16.36 12,14.9 15,14.9Z" /></svg>
+                            <% parameters = {attendee: current_user.id, attended_event: event.id} %>
+                            <%= link_to 'Attend', event_attendance_path(id: 'create', attendance: parameters), id:'show-link' %>
+                        <% end %>
+                    <% end %>
+                </div>
+    </div>
+</div>
+<div id='event-box'>
+    <div id='attendants'>
+        <p id='attendants-title'>Attendants</p>
+        <ul>
+        <% EventAttendance.where(attended_event: event.id).each do |user|%>
+            <li><%= User.find(user.attendee).email %></li>
+        <% end %>
+        </ul>
+    </div>
+</div>
+<% else %>
+    <%= render 'unauthorized'%>
+<% end %>
